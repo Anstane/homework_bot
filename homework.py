@@ -112,6 +112,7 @@ def main():
     """Основная логика работы бота."""
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
+    latest_homework = {}
     if check_tokens() is False:
         logging.critical(
             'Не были получены все необходимые данные,'
@@ -126,19 +127,30 @@ def main():
                 )
                 homeworks = check_response(response)
                 for homework in homeworks:
-                    homework = homework.get('status')
+                    latest_homework = {
+                        homework['homework_name']: homework['status']
+                    }
                     message = parse_status(homework)
-                    try:
-                        send_message(bot, message)
-                        logging.info('Сообщение было отправлено')
-                    except RuntimeError as error:
-                        logging.error(f'Ошибка при отправке сообщения {error}')
-                        raise RuntimeError('Не удалось отправить сообщениие')
-                else:
-                    logging.debug('Статус не изменился')
+                    if (
+                        homework['homework_name'] == latest_homework.keys()
+                        and homework['status'] != latest_homework.values()
+                    ):
+                        try:
+                            send_message(bot, message)
+                            logging.info('Сообщение было отправлено')
+                        except RuntimeError as error:
+                            logging.error(
+                                f'Ошибка при отправке сообщения {error}'
+                            )
+                            raise RuntimeError(
+                                'Не удалось отправить сообщениие'
+                            )
+                    else:
+                        logging.debug('Статус не изменился')
             except Exception as error:
                 message = f'Сбой в работе программы: {error}'
                 bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
+            finally:
                 time.sleep(RETRY_TIME)
 
 
