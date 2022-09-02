@@ -120,6 +120,7 @@ def parse_status(homework):
     verdict = HOMEWORK_STATUSES[status]
     return f'Изменился статус проверки работы "{name}". {verdict}'
 
+
 def check_tokens():
     """Проверяем, что все токены на месте."""
     return all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID])
@@ -128,7 +129,7 @@ def check_tokens():
 def main():
     """Основная логика работы бота."""
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
-    current_timestamp = int(time.time() - 1000000)
+    current_timestamp = int(time.time())
     check_tokens()
     a = False
     if a:
