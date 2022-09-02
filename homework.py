@@ -109,7 +109,6 @@ def parse_status(homework):
     """
     if 'homework_name' not in homework:
         logger.error(f'Информация о ДЗ {homework} недоступна')
-        raise DataNotFoundError('Информация о домашнем задании отстуствует')
     name = homework['homework_name']
     if 'status' not in homework:
         logger.error(f'Информация о ДЗ {homework} недоступна')
