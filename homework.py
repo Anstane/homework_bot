@@ -47,7 +47,7 @@ logger.addHandler(handler)
 def send_message(bot, message):
     """Просто отправляем сообщение в чат."""
     try:
-        bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=f'{message}')
+        bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
         logger.info('Сообщение было успешно отправлено')
     except MessageError as error:
         logger.error(f'Сообщение не было отправлено, ошибка: {error}')
@@ -91,14 +91,14 @@ def check_response(response):
     В случае корректности - возвращаем 'homeworks'.
     """
     if not isinstance(response, dict):
-        raise TypeError
-    else:
-        try:
-            homework = response.get('homeworks')
-        except KeyError as error:
-            logger.error(f'При получении данных возникла ошибка {error}')
+        raise TypeError('При запросе получен некорректный тип данных')
+    if 'current_date' not in response:
+        raise DataNotFoundError('В запросе отсуствует ключ current_date')
+    homework = response.get('homeworks')
+    if homework is None:
+        raise DataNotFoundError('Получена пустая переменная')
     if not isinstance(homework, list):
-        raise TypeError
+        raise TypeError('Ошибка, homework не является списком')
     return homework
 
 
@@ -129,9 +129,7 @@ def main():
     """Основная логика работы бота."""
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     current_timestamp = int(time.time())
-    check_tokens()
-    a = False
-    if a:
+    if not check_tokens():
         logger.critical(
             'Не были получены все необходимые данные,'
             ' программа прекратила работу'
